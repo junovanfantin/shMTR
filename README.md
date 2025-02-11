@@ -80,7 +80,7 @@ Apresento o shMTR, um utilitário de linha de comando para rastreamento de rotas
 
 ### Relatórios
 
-Para gerar um relatório, pressione a tecla "s" durante a execução do script. O relatório será salvo em um arquivo com o nome `shMTR-IP-DATA.txt`.
+Para gerar um relatório, pressione a opção "-ss" ao executar o script. O relatório será salvo em um arquivo com o nome `shMTR-DATA-IP.txt`.
 
 ### Contribuições
 

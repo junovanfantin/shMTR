@@ -88,5 +88,3 @@ Sinta-se à vontade para enviar pull requests com melhorias e sugestões!
 ### Créditos
 
 Este script foi criado por Junovan Fantin em conjunto com Gemini 2.0 Flash.
-
-Espero que este post seja útil! Lembre-se de adaptar o conteúdo e as informações para o seu repositório. 

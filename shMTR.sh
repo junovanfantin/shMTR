@@ -8,6 +8,7 @@ timeout_padrao=100  # Timeout padrão
 timeout=$timeout_padrao # Timeout inicial
 num_testes=1 # Número de testes por IP
 declare -A ip_data # Array associativo para dados de IP
+salvar_resultados=false # Variável para controlar se os resultados serão salvos
 
 # Função para calcular estatísticas de ping
 calculate_ping_stats() {
@@ -18,7 +19,7 @@ calculate_ping_stats() {
     local last_ping="N/A"
 
     # Recupera dados existentes (se houver)
-    if [[ -v "ip_data[$ip]" ]]; then
+    if [[ -v ip_data[$ip] ]]; then
         IFS='|' read -r stored_total_time stored_lost_packets stored_sent_packets stored_last_ping <<< "${ip_data[$ip]}"
         total_time="$stored_total_time"
         lost_packets="$stored_lost_packets"
@@ -77,25 +78,14 @@ update_table() {
 save_results() {
     local target_ip=$1
     local timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    local filename="shMTR-${target_ip}-${timestamp}.txt"
+    local filename="shMTR-${timestamp}-${target_ip}.txt" # Nome do arquivo fixo
 
-    echo "shMTR - Resultados para $target_ip" > "$filename"
-    echo "==================================================================================" >> "$filename"
-    echo "Nº | IP              | Último Ping  | Média Ping  | Pacotes Enviados | Pacotes Perdidos" >> "$filename"
-    echo "----------------------------------------------------------------------------------" >> "$filename"
+    # Captura a saída do comando update_table
+    saida_tabela=$(update_table)
 
-    count=0
-    ips=($(traceroute -n -m 20 "$target_ip" -q 1 -N 100 | awk '{print $2}' | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b"))
+    # Escreve a saída capturada no arquivo
+    echo "$saida_tabela" > "$filename"
 
-    for ip in "${ips[@]}"; do
-        printf "%-3d | %-15s | " "$((++count))" "$ip" >> "$filename"
-        IFS='|' read -r stored_total_time stored_lost_packets stored_sent_packets stored_last_ping <<< "${ip_data[$ip]}"
-        average_time=$(echo "scale=2; $stored_total_time / ( $stored_sent_packets - $stored_lost_packets )" | bc)
-        loss_percentage=$(echo "scale=2; ($lost_packets / $stored_sent_packets) * 100" | bc)
-        printf "%-12s | %-11s | %-12s | %s\n" "$stored_last_ping" "$average_time" "$stored_sent_packets" "$stored_lost_packets ($loss_percentage%)" >> "$filename"
-    done
-
-    echo "==================================================================================" >> "$filename"
     echo "Resultados salvos em $filename"
 }
 
@@ -107,10 +97,11 @@ exibir_tutorial() {
     echo "Opções:"
     echo "-t <timeout>  Define o timeout para ping em ms (padrão: $timeout_padrao ms)"
     echo "-n <testes>   Define o número de testes por IP (padrão: 1)"
+    echo "-s            Salva os resultados em um arquivo shMTR-DATA-IP.txt"
     echo "--help | -h   Exibe este tutorial"
     echo ""
     echo "Exemplos:"
-    echo "shMTR 8.8.8.8 -t 200 -n 5"
+    echo "shMTR 8.8.8.8 -t 200 -n 5 -s"
     echo "shMTR 192.168.1.1"
 }
 
@@ -124,6 +115,10 @@ while [[ $# -gt 0 ]]; do
         -n)
             num_testes="$2"
             shift 2
+            ;;
+        -s)
+            salvar_resultados=true
+            shift
             ;;
         --help|-h)
             exibir_tutorial
@@ -151,11 +146,18 @@ if [[ -z "$target_ip" ]]; then
     done
 fi
 
+# Pergunta se o usuário quer salvar o arquivo (se não especificado por parâmetro)
+if [[ -z "$salvar_resultados" ]]; then
+    read -p "Deseja salvar os resultados em shMTR-DATA-IP.txt? (s/n): " salvar
+    if [[ "$salvar" == "s" || "$salvar" == "S" ]]; then
+        salvar_resultados=true
+    fi
+fi
+
 # Executa o rastreamento
 update_table
 
 # Salva resultados (se solicitado)
-read -t 0 -n 1 input
-if [[ $input == "s" || $input == "S" ]]; then
+if [[ "$salvar_resultados" == true ]]; then
     save_results "$target_ip"
 fi

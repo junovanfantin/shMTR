@@ -75,6 +75,7 @@ Apresento o shMTR, um utilitário de linha de comando para rastreamento de rotas
 
 *   `-t <timeout>`: Define o timeout para ping em ms (padrão: 100ms)
 *   `-n <testes>`: Define o número de testes por IP (padrão: 1)
+*   `-s`: Salva os resultados em um arquivo shMTR-DATA-IP.txt (padrão: não)
 *   `--help | -h`: Exibe este tutorial
 
 ### Relatórios

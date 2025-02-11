@@ -1,5 +1,3 @@
-Com certeza! Aqui está uma sugestão de post para o GitHub que você pode adaptar e usar como base:
-
 ## shMTR - ShellMTR para Shell Script
 
 Olá! 

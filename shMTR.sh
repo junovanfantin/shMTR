@@ -3,12 +3,12 @@
 # shMTR - Rastreando rotas com estilo!
 # Criado por Junovan Fantin em conjunto com Gemini 2.0 Flash
 
-# Variáveis
-timeout_padrao=100  # Timeout padrão
-timeout=$timeout_padrao # Timeout inicial
-num_testes=1 # Número de testes por IP
-declare -A ip_data # Array associativo para dados de IP
-salvar_resultados=false # Variável para controlar se os resultados serão salvos
+# Variáveis padrão
+timeout_padrao=100  # Timeout padrão em milissegundos
+timeout=$timeout_padrao
+num_testes=1        # Número de testes por IP
+declare -A ip_data  # Array associativo para dados de IP
+salvar_resultados=false  # Variável para controlar se os resultados serão salvos
 
 # Função para calcular estatísticas de ping
 calculate_ping_stats() {
@@ -27,10 +27,13 @@ calculate_ping_stats() {
         last_ping="$stored_last_ping"
     fi
 
+    # Converte timeout para segundos (permitindo valores fracionários)
+    local timeout_seconds=$(echo "scale=3; $timeout / 1000" | bc)
+
     # Loop de testes de ping
     for i in $(seq 1 $num_testes); do
         sent_packets=$((sent_packets + 1))
-        ping_result=$(ping -c 1 -W 1 -t "$timeout" "$ip" | grep 'time=' | awk '{print $7}' | cut -d '=' -f 2)
+        ping_result=$(ping -c 1 -W "$timeout_seconds" "$ip" | grep 'time=' | awk '{print $7}' | cut -d '=' -f 2)
         if [ -z "$ping_result" ]; then
             lost_packets=$((lost_packets + 1))
         else
@@ -61,16 +64,13 @@ update_table() {
     echo "=================================================================================="
     printf "%-3s | %-15s | %-12s | %-11s | %-15s | %s\n" "Nº" "IP" "Último Ping" "Média Ping" "Pacotes Enviados" "Pacotes Perdidos"
     echo "----------------------------------------------------------------------------------"
-
     count=0
     ips=($(traceroute -n -m 20 "$target_ip" -q 1 -N 100 | awk '{print $2}' | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b"))
-
     for ip in "${ips[@]}"; do
         printf "%-3d | %-15s | " "$((++count))" "$ip"
         IFS='|' read -r last_ping average_time sent_packets lost_packets <<< "$(calculate_ping_stats "$ip")"
         printf "%-12s | %-11s | %-12s | %s\n" "$last_ping" "$average_time" "$sent_packets" "$lost_packets"
     done
-
     echo "=================================================================================="
 }
 
@@ -78,14 +78,13 @@ update_table() {
 save_results() {
     local target_ip=$1
     local timestamp=$(date +"%Y-%m-%d_%H-%M-%S")
-    local filename="shMTR-${timestamp}-${target_ip}.txt" # Nome do arquivo fixo
+    local filename="shMTR-${timestamp}-${target_ip}.txt"
 
     # Captura a saída do comando update_table
     saida_tabela=$(update_table)
 
     # Escreve a saída capturada no arquivo
     echo "$saida_tabela" > "$filename"
-
     echo "Resultados salvos em $filename"
 }
 
@@ -95,10 +94,10 @@ exibir_tutorial() {
     echo "Uso: shMTR [IP] [OPÇÕES]"
     echo ""
     echo "Opções:"
-    echo "-t <timeout>  Define o timeout para ping em ms (padrão: $timeout_padrao ms)"
-    echo "-n <testes>   Define o número de testes por IP (padrão: 1)"
-    echo "-s            Salva os resultados em um arquivo shMTR-DATA-IP.txt"
-    echo "--help | -h   Exibe este tutorial"
+    echo "-t  Define o timeout para ping em ms (padrão: $timeout_padrao ms)"
+    echo "-n  Define o número de testes por IP (padrão: 1)"
+    echo "-s  Salva os resultados em um arquivo shMTR-DATA-IP.txt"
+    echo "--help | -h  Exibe este tutorial"
     echo ""
     echo "Exemplos:"
     echo "shMTR 8.8.8.8 -t 200 -n 5 -s"

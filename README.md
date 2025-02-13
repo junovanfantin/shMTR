@@ -14,12 +14,12 @@ Apresento o shMTR, um utilitário de linha de comando para rastreamento de rotas
 *   Geração de relatórios
 
 ## Como usar 
-    ```bash
+    ```
     curl -sL https://raw.githubusercontent.com/junovanfantin/shMTR/refs/heads/main/shMTR.sh | bash -s -- <IP> -n <QTD TESTES> -t <TIMEOUT>
     ```
     
     Exemplo:
-    ```bash
+    ```
     curl -sL https://raw.githubusercontent.com/junovanfantin/shMTR/refs/heads/main/shMTR.sh | bash -s -- 8.8.8.8 -n 5 -t 200
     ```
     

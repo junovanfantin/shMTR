@@ -3,6 +3,67 @@
 # shMTR - Rastreando rotas com estilo!
 # Criado por Junovan Fantin em conjunto com Gemini 2.0 Flash
 
+
+# Função para verificar se o comando existe
+check_command() {
+  command -v "$1" &>/dev/null
+  return $?
+}
+
+# Função para detectar o tipo de distribuição
+get_distro() {
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    echo "$ID"
+  else
+    echo "unknown"
+  fi
+}
+
+# Detecta a distribuição
+DISTRO=$(get_distro)
+
+# Verifica se 'bc', 'ping' e 'traceroute' estão instalados e instala conforme a distribuição
+if ! check_command "bc"; then
+  echo "Erro: O pacote 'bc' não está instalado."
+  if [[ "$DISTRO" == "ubuntu" || "$DISTRO" == "debian" ]]; then
+    echo "Instalando 'bc' no Debian/Ubuntu..."
+    sudo apt-get install bc -y
+  elif [[ "$DISTRO" == "centos" || "$DISTRO" == "rhel" || "$DISTRO" == "fedora" ]]; then
+    echo "Instalando 'bc' no CentOS/RHEL/Fedora..."
+    sudo yum install bc -y || sudo dnf install bc -y
+  else
+    echo "Distribuição não suportada para instalação automática."
+  fi
+fi
+
+if ! check_command "ping"; then
+  echo "Erro: O pacote 'ping' não está instalado."
+  if [[ "$DISTRO" == "ubuntu" || "$DISTRO" == "debian" ]]; then
+    echo "Instalando 'ping' no Debian/Ubuntu..."
+    sudo apt-get install inetutils-ping -y
+  elif [[ "$DISTRO" == "centos" || "$DISTRO" == "rhel" || "$DISTRO" == "fedora" ]]; then
+    echo "Instalando 'ping' no CentOS/RHEL/Fedora..."
+    sudo yum install inetutils-ping -y || sudo dnf install inetutils-ping -y
+  else
+    echo "Distribuição não suportada para instalação automática."
+  fi
+fi
+
+if ! check_command "traceroute"; then
+  echo "Erro: O pacote 'traceroute' não está instalado."
+  if [[ "$DISTRO" == "ubuntu" || "$DISTRO" == "debian" ]]; then
+    echo "Instalando 'traceroute' no Debian/Ubuntu..."
+    sudo apt-get install traceroute -y
+  elif [[ "$DISTRO" == "centos" || "$DISTRO" == "rhel" || "$DISTRO" == "fedora" ]]; then
+    echo "Instalando 'traceroute' no CentOS/RHEL/Fedora..."
+    sudo yum install traceroute -y || sudo dnf install traceroute -y
+  else
+    echo "Distribuição não suportada para instalação automática."
+  fi
+fi
+
+
 # Variáveis padrão
 timeout_padrao=100  # Timeout padrão em milissegundos
 timeout=$timeout_padrao

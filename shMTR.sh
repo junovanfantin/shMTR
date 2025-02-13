@@ -28,7 +28,7 @@ calculate_ping_stats() {
     fi
 
     # Converte timeout para segundos (permitindo valores fracionários)
-    timeout_seconds=$(awk "BEGIN {print ($timeout / 1000) < 1 ? 1 : ($timeout / 1000)}")
+    timeout_seconds=$(awk "BEGIN {print int($timeout / 1000) < 1 ? 1 : int($timeout / 1000)}")
 
     # Loop de testes de ping
     for i in $(seq 1 $num_testes); do

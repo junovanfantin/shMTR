@@ -30,7 +30,7 @@ Apresento o shMTR, um utilitário de linha de comando para rastreamento de rotas
 1.  Clone este repositório:
 
     ```bash
-    git clone https://github.com/seu-nome-de-usuario/shMTR.git
+    git clone https://github.com/junovanfantin/shMTR.git
     ```
 
 2.  Navegue até o diretório:

@@ -13,7 +13,19 @@ Apresento o shMTR, um utilitário de linha de comando para rastreamento de rotas
 *   Interface de linha de comando interativa
 *   Geração de relatórios
 
-### Como usar
+## Como usar 
+    ```bash
+    curl -sL https://raw.githubusercontent.com/junovanfantin/shMTR/refs/heads/main/shMTR.sh | bash -s -- <IP> -n <QTD TESTES> -t <TIMEOUT>
+    ```
+    
+    Exemplo:
+    ```bash
+    curl -sL https://raw.githubusercontent.com/junovanfantin/shMTR/refs/heads/main/shMTR.sh | bash -s -- 8.8.8.8 -n 5 -t 200
+    ```
+    
+    Para usar o modo Interativo é necessário baixar o script para realizar sua execução manual.
+
+### Como usar manualmente
 
 1.  Clone este repositório:
 
